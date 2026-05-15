@@ -73,9 +73,17 @@ export function ElectronicsRoadmap({ books, fields }: ElectronicsRoadmapProps) {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {fields.map((field) => {
-          const fieldBookCount = books.filter((book) =>
+          const fieldBooksForCard = books.filter((book) =>
             field.bookCategories.includes(book.category),
-          ).length
+          )
+          const fieldBookCount = fieldBooksForCard.length
+          const fieldProgress =
+            fieldBookCount > 0
+              ? Math.round(
+                  fieldBooksForCard.reduce((total, book) => total + book.progress, 0) /
+                    fieldBookCount,
+                )
+              : field.progress
           const isActive = field.id === activeField?.id
 
           return (
@@ -92,9 +100,6 @@ export function ElectronicsRoadmap({ books, fields }: ElectronicsRoadmapProps) {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-lg font-semibold text-white">{field.name}</h3>
-                  {field.credential && (
-                    <p className="mt-1 text-sm text-emerald-200">{field.credential}</p>
-                  )}
                 </div>
                 <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs ${statusClasses[field.status]}`}>
                   {field.status}
@@ -106,9 +111,9 @@ export function ElectronicsRoadmap({ books, fields }: ElectronicsRoadmapProps) {
               <div className="mt-5">
                 <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
                   <span>{fieldBookCount} books</span>
-                  <span className="font-mono text-slate-300">{field.progress}%</span>
+                  <span className="font-mono text-slate-300">{fieldProgress}%</span>
                 </div>
-                <ProgressBar value={field.progress} accent={field.accent} />
+                <ProgressBar value={fieldProgress} accent={field.accent} />
               </div>
             </button>
           )
@@ -121,11 +126,6 @@ export function ElectronicsRoadmap({ books, fields }: ElectronicsRoadmapProps) {
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-sky-300">Selected field</p>
               <h3 className="mt-3 text-2xl font-semibold text-white">{activeField.name}</h3>
-              {activeField.credential && (
-                <p className="mt-2 text-sm font-medium text-emerald-200">
-                  {activeField.credential}
-                </p>
-              )}
               <span className={`mt-3 inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs ${statusClasses[activeField.status]}`}>
                 {activeField.status}
               </span>
